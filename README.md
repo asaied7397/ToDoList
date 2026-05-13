@@ -70,12 +70,6 @@ Follow these steps to run the project on your machine.
 ### 1. Clone the Repository
 
 ```bash
-git clone YOUR_REPOSITORY_LINK
-```
-
-Example:
-
-```bash
 git clone https://github.com/asaied7397/ToDoList
 ```
 
