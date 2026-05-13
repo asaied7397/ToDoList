@@ -97,9 +97,28 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
           flexShrink: 0,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 800 }}>
-          {title}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              backgroundColor:
+                id === "backlog"
+                  ? " #1976d2"
+                  : id === "in_progress"
+                    ? "#f59e0b"
+                    : id === "review"
+                      ? "#e20bf5"
+                      : "#2e7d32",
+              flexShrink: 0,
+            }}
+          />
+
+          <Typography variant="h6" sx={{ fontWeight: 800 }}>
+            {title}
+          </Typography>
+        </Box>
 
         <Typography
           variant="caption"
@@ -154,6 +173,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
             mt: 2,
             flexWrap: "wrap",
             flexShrink: 0,
+            marginBottom: 2,
           }}
         >
           <Button

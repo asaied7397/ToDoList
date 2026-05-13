@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 import {
   DndContext,
   type DragEndEvent,
@@ -6,24 +7,24 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
 import type { ColumnConfig, Task, TaskColumn } from "../types";
-import { updateTask } from "../api/tasksAPI";
+import { updateTask, getTasksByColumn } from "../api/tasksAPI";
 import KanbanColumn from "./KanbanColumn";
 import SearchBar from "./SearchBar";
 import TaskDialog from "./TaskDialog";
 
 const columns: ColumnConfig[] = [
-  { id: "backlog", title: "Backlog" },
+  { id: "backlog", title: "To Do" },
   { id: "in_progress", title: "In Progress" },
-  { id: "review", title: "Review" },
+  { id: "review", title: "In Review" },
   { id: "done", title: "Done" },
 ];
 
 export default function KanbanBoard() {
   const queryClient = useQueryClient();
 
-  // Configure the pointer sensor with an activation constraint to prevent accidental drags
+  // Setup drag-and-drop sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -32,7 +33,24 @@ export default function KanbanBoard() {
     }),
   );
 
-  // Mutation to update a task's column when it's moved
+  // Fetch task counts for all columns to display total count in header
+  const taskCountQueries = useQueries({
+    queries: columns.map((column) => ({
+      queryKey: ["tasks-count", column.id],
+      queryFn: () =>
+        getTasksByColumn({
+          column: column.id,
+          page: 1,
+          limit: 9999,
+        }),
+    })),
+  });
+
+  const totalTasksCount = taskCountQueries.reduce((total, query) => {
+    return total + (query.data?.totalCount ?? 0);
+  }, 0);
+
+  // Mutation to move task between columns
   const moveTaskMutation = useMutation({
     mutationFn: ({ taskId, column }: { taskId: string; column: TaskColumn }) =>
       updateTask(taskId, { column }),
@@ -40,10 +58,13 @@ export default function KanbanBoard() {
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-count"],
+      });
     },
   });
 
-  // Handle the end of a drag event to move the task to the new column
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -66,24 +87,47 @@ export default function KanbanBoard() {
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
           alignItems: "center",
+          justifyContent: "space-between",
           flexWrap: "wrap",
           gap: 2,
-          borderBottom: "1px solid",
-          borderColor: "#e0e0e0",
-          paddingBottom: 1,
-          marginBottom: 50,
+          marginBottom: 3,
         }}
       >
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 900 }}>
-            Kanban ToDo Dashboard
-          </Typography>
+        <Box
+          sx={{
+            mb: 3,
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              width: 52,
+              height: 52,
+              borderRadius: 3,
+              backgroundColor: "#1976d2",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+              boxShadow: "0 8px 20px rgba(25, 118, 210, 0.25)",
+            }}
+          >
+            <DashboardCustomizeIcon fontSize="medium" />
+          </Box>
 
-          <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-            Manage tasks across Backlog, In Progress, Review, and Done.
-          </Typography>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 900 }}>
+              Kanban Board
+            </Typography>
+
+            <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+              Total Tasks: {totalTasksCount}
+            </Typography>
+          </Box>
         </Box>
 
         <SearchBar />

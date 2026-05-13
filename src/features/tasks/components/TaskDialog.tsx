@@ -16,13 +16,19 @@ import { useState } from "react";
 import type { RootState } from "../../../app/store";
 import { closeTaskDialog } from "../store/taskUISlice";
 import { createTask, updateTask } from "../api/tasksAPI";
-import type { Task, TaskColumn } from "../types";
+import type { Task, TaskColumn, TaskPriority } from "../types";
 
 const columnOptions: { label: string; value: TaskColumn }[] = [
-  { label: "Backlog", value: "backlog" },
+  { label: "To Do", value: "backlog" },
   { label: "In Progress", value: "in_progress" },
-  { label: "Review", value: "review" },
+  { label: "In Review", value: "review" },
   { label: "Done", value: "done" },
+];
+
+const priorityOptions: { label: string; value: TaskPriority }[] = [
+  { label: "Low", value: "low" },
+  { label: "Medium", value: "medium" },
+  { label: "High", value: "high" },
 ];
 
 interface TaskFormProps {
@@ -37,11 +43,17 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
   const isEditMode = Boolean(selectedTask);
 
   const [title, setTitle] = useState(selectedTask?.title ?? "");
+
   const [description, setDescription] = useState(
     selectedTask?.description ?? "",
   );
+
   const [column, setColumn] = useState<TaskColumn>(
-    selectedTask?.column ?? selectedColumn ?? "backlog",
+    selectedTask?.column ?? selectedColumn,
+  );
+
+  const [priority, setPriority] = useState<TaskPriority>(
+    selectedTask?.priority ?? "medium",
   );
 
   const createMutation = useMutation({
@@ -49,6 +61,9 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-count"],
       });
       onClose();
     },
@@ -64,11 +79,15 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
         title: title.trim(),
         description: description.trim(),
         column,
+        priority,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["tasks-count"],
       });
       onClose();
     },
@@ -88,6 +107,7 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
       title: title.trim(),
       description: description.trim(),
       column,
+      priority,
     });
   }
 
@@ -104,7 +124,7 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
         <TextField
           label="Title"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(event) => setTitle(event.target.value)}
           fullWidth
           required
         />
@@ -112,7 +132,7 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
         <TextField
           label="Description"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(event) => setDescription(event.target.value)}
           fullWidth
           required
           multiline
@@ -124,9 +144,26 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
           <Select
             label="Column"
             value={column}
-            onChange={(e) => setColumn(e.target.value as TaskColumn)}
+            onChange={(event) => setColumn(event.target.value as TaskColumn)}
           >
             {columnOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl fullWidth>
+          <InputLabel>Priority</InputLabel>
+          <Select
+            label="Priority"
+            value={priority}
+            onChange={(event) =>
+              setPriority(event.target.value as TaskPriority)
+            }
+          >
+            {priorityOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>
                 {option.label}
               </MenuItem>
@@ -169,7 +206,7 @@ export default function TaskDialog() {
 
       {isDialogOpen && (
         <TaskForm
-          key={selectedTask?.id ?? "create-task"}
+          key={selectedTask?.id ?? `create-task-${selectedColumn}`}
           selectedTask={selectedTask}
           selectedColumn={selectedColumn}
           onClose={handleClose}

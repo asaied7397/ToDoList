@@ -4,49 +4,57 @@
       "id": "1",
       "title": "Design homepage",
       "description": "Create hero section and main layout",
-      "column": "backlog"
+      "column": "backlog",
+      "priority": "high"
     },
     {
       "id": "2",
       "title": "Setup project structure",
       "description": "Create scalable folders and install required dependencies",
-      "column": "backlog"
+      "column": "backlog",
+      "priority": "medium"
     },
     {
       "id": "3",
       "title": "Build authentication flow",
       "description": "Create login, register, and protected route logic",
-      "column": "in_progress"
+      "column": "in_progress",
+      "priority": "high"
     },
     {
       "id": "4",
       "title": "Connect React Query",
       "description": "Fetch and cache task data from json-server API",
-      "column": "in_progress"
+      "column": "in_progress",
+      "priority": "medium"
     },
     {
       "id": "5",
       "title": "Review dashboard layout",
       "description": "Check spacing, responsiveness, and card design",
-      "column": "review"
+      "column": "review",
+      "priority": "low"
     },
     {
       "id": "6",
       "title": "Test drag and drop",
       "description": "Validate moving tasks between all columns",
-      "column": "review"
+      "column": "review",
+      "priority": "high"
     },
     {
       "id": "7",
       "title": "Deploy production build",
       "description": "Deploy the application and test the live environment",
-      "column": "done"
+      "column": "done",
+      "priority": "medium"
     },
     {
       "id": "8",
       "title": "Write README file",
       "description": "Add setup instructions, features, and tech stack",
-      "column": "done"
+      "column": "done",
+      "priority": "low"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
