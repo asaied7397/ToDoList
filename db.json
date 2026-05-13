@@ -1,0 +1,77 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "title": "Design homepage",
+      "description": "Create hero section and main layout",
+      "column": "backlog"
+    },
+    {
+      "id": "2",
+      "title": "Setup project structure",
+      "description": "Create scalable folders and install required dependencies",
+      "column": "backlog"
+    },
+    {
+      "id": "3",
+      "title": "Build authentication flow",
+      "description": "Create login, register, and protected route logic",
+      "column": "in_progress"
+    },
+    {
+      "id": "4",
+      "title": "Connect React Query",
+      "description": "Fetch and cache task data from json-server API",
+      "column": "in_progress"
+    },
+    {
+      "id": "5",
+      "title": "Review dashboard layout",
+      "description": "Check spacing, responsiveness, and card design",
+      "column": "review"
+    },
+    {
+      "id": "6",
+      "title": "Test drag and drop",
+      "description": "Validate moving tasks between all columns",
+      "column": "review"
+    },
+    {
+      "id": "7",
+      "title": "Deploy production build",
+      "description": "Deploy the application and test the live environment",
+      "column": "done"
+    },
+    {
+      "id": "8",
+      "title": "Write README file",
+      "description": "Add setup instructions, features, and tech stack",
+      "column": "done"
+    },
+    {
+      "title": "ahmed",
+      "description": "hbbhd",
+      "column": "backlog",
+      "id": "NwL8M1RlmD8"
+    },
+    {
+      "title": "ahmed2",
+      "description": "gabhvdx",
+      "column": "backlog",
+      "id": "yU7Clv4qc_Y"
+    },
+    {
+      "title": "ahmed3",
+      "description": "bhdnm",
+      "column": "backlog",
+      "id": "1TsGpqENJ0U"
+    },
+    {
+      "title": "ahmed4",
+      "description": "fcvgbhnj",
+      "column": "backlog",
+      "id": "ICh36yTgYQ8"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
