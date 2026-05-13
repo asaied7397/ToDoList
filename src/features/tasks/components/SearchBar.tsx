@@ -23,7 +23,7 @@ export default function SearchBar() {
         size="small"
         placeholder="Search by title or description..."
         value={search}
-        onChange={(event) => dispatch(setSearch(event.target.value))}
+        onChange={(e) => dispatch(setSearch(e.target.value))}
         sx={{
           width: {
             xs: "100%",

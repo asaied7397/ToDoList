@@ -103,7 +103,7 @@ function TaskForm({ selectedTask, onClose }: TaskFormProps) {
         <TextField
           label="Title"
           value={title}
-          onChange={(event) => setTitle(event.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           fullWidth
           required
         />
@@ -111,7 +111,7 @@ function TaskForm({ selectedTask, onClose }: TaskFormProps) {
         <TextField
           label="Description"
           value={description}
-          onChange={(event) => setDescription(event.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           fullWidth
           required
           multiline
@@ -123,7 +123,7 @@ function TaskForm({ selectedTask, onClose }: TaskFormProps) {
           <Select
             label="Column"
             value={column}
-            onChange={(event) => setColumn(event.target.value as TaskColumn)}
+            onChange={(e) => setColumn(e.target.value as TaskColumn)}
           >
             {columnOptions.map((option) => (
               <MenuItem key={option.value} value={option.value}>

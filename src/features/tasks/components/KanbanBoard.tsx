@@ -23,6 +23,7 @@ const columns: ColumnConfig[] = [
 export default function KanbanBoard() {
   const queryClient = useQueryClient();
 
+  // Configure the pointer sensor with an activation constraint to prevent accidental drags
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -31,6 +32,7 @@ export default function KanbanBoard() {
     }),
   );
 
+  // Mutation to update a task's column when it's moved
   const moveTaskMutation = useMutation({
     mutationFn: ({ taskId, column }: { taskId: string; column: TaskColumn }) =>
       updateTask(taskId, { column }),
@@ -41,6 +43,7 @@ export default function KanbanBoard() {
     },
   });
 
+  // Handle the end of a drag event to move the task to the new column
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 

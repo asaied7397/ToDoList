@@ -25,13 +25,16 @@ const PAGE_LIMIT = 5;
 export default function KanbanColumn({ id, title }: KanbanColumnProps) {
   const dispatch = useDispatch();
 
+  // Get search and page state from Redux
   const search = useSelector((state: RootState) => state.taskUi.search);
   const page = useSelector((state: RootState) => state.taskUi.pages[id]);
 
+  // Setup droppable area for drag-and-drop
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
 
+  // Fetch tasks for this column using React Query
   const { data, isLoading, isError } = useQuery({
     queryKey: ["tasks", id, search, page],
     queryFn: () =>

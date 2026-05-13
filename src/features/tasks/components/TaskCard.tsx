@@ -17,6 +17,7 @@ export default function TaskCard({ task }: TaskCardProps) {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
+  // Set up the draggable behavior for the task card
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: task.id,
@@ -25,6 +26,7 @@ export default function TaskCard({ task }: TaskCardProps) {
       },
     });
 
+  // Set up the mutation for deleting a task
   const deleteMutation = useMutation({
     mutationFn: deleteTask,
     onSuccess: () => {
@@ -64,8 +66,8 @@ export default function TaskCard({ task }: TaskCardProps) {
           </Typography>
 
           <Box
-            onPointerDown={(event) => event.stopPropagation()}
-            onMouseDown={(event) => event.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             <IconButton
               size="small"
