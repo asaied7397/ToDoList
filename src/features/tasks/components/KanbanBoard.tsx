@@ -8,7 +8,7 @@ import {
 } from "@dnd-kit/core";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ColumnConfig, Task, TaskColumn } from "../types";
-import { updateTask } from "../api/tasksApi";
+import { updateTask } from "../api/tasksAPI";
 import KanbanColumn from "./KanbanColumn";
 import SearchBar from "./SearchBar";
 import TaskDialog from "./TaskDialog";

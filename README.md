@@ -1,73 +1,55 @@
-# React + TypeScript + Vite
+# Kanban ToDo Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Kanban-style ToDo dashboard built with React, TypeScript, Redux Toolkit, React Query, Material UI, dnd-kit, and json-server.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Display tasks across 4 columns:
+  - Backlog
+  - In Progress
+  - Review
+  - Done
+- Create new tasks
+- Update existing tasks
+- Delete tasks
+- Drag and drop tasks between columns
+- Search tasks by title or description
+- Pagination per column
+- Data fetching and caching using React Query
+- UI built with Material UI
+- Local mock API using json-server
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- TypeScript
+- Redux Toolkit
+- React Query
+- Material UI
+- dnd-kit
+- Axios
+- json-server
+- Vite
 
-## Expanding the ESLint configuration
+## Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+src/
+├─ app/
+│ ├─ providers.tsx
+│ └─ store.ts
+├─ features/
+│ └─ tasks/
+│ ├─ api/
+│ │ └─ tasksApi.ts
+│ ├─ components/
+│ │ ├─ KanbanBoard.tsx
+│ │ ├─ KanbanColumn.tsx
+│ │ ├─ SearchBar.tsx
+│ │ ├─ TaskCard.tsx
+│ │ └─ TaskDialog.tsx
+│ ├─ store/
+│ │ └─ taskUiSlice.ts
+│ └─ types.ts
+├─ App.tsx
+├─ main.tsx
+└─ index.css
