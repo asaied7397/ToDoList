@@ -6,6 +6,7 @@ import type {
   UpdateTaskPayload,
 } from "../types";
 
+// Create an Axios instance with the base URL of the API
 const api = axios.create({
   baseURL: "http://localhost:4000",
 });
@@ -32,6 +33,7 @@ type JsonServerV1PaginatedResponse<T> = {
   data: T[];
 };
 
+// Type guard to check if the response is a paginated response
 function isPaginatedResponse<T>(
   value: unknown,
 ): value is JsonServerV1PaginatedResponse<T> {
@@ -43,10 +45,12 @@ function isPaginatedResponse<T>(
   );
 }
 
+// Helper function to normalize text for case-insensitive search
 function normalizeText(value: string): string {
   return value.toLowerCase().trim();
 }
 
+// Helper function to extract tasks from either a direct array or a paginated response
 function extractTasks(
   data: Task[] | JsonServerV1PaginatedResponse<Task>,
 ): Task[] {
@@ -61,6 +65,7 @@ function extractTasks(
   return [];
 }
 
+// API functions
 export async function getTasksByColumn({
   column,
   search = "",
@@ -80,6 +85,7 @@ export async function getTasksByColumn({
 
   const normalizedSearch = normalizeText(search);
 
+  // Filter tasks based on the search query (case-insensitive)
   const filteredTasks = normalizedSearch
     ? allColumnTasks.filter((task) => {
         const title = normalizeText(task.title);
@@ -101,6 +107,7 @@ export async function getTasksByColumn({
   };
 }
 
+// API functions for creating, updating, and deleting tasks
 export async function createTask(payload: CreateTaskPayload): Promise<Task> {
   const response = await api.post<Task>("/tasks", {
     ...payload,
