@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import { useEffect, useMemo, useState } from "react";
 import type { RootState } from "../../../app/store";
-import { getTasksByColumn } from "../api/tasksApi";
+import { getTasksByColumn } from "../api/tasksAPI";
 import type { TaskColumn } from "../types";
 import TaskCard from "./TaskCard";
 
@@ -85,7 +85,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
           flexShrink: 0,
         }}
       >
-        <Typography variant="h6" fontWeight={800}>
+        <Typography variant="h6" sx={{ fontWeight: 800 }}>
           {title}
         </Typography>
 

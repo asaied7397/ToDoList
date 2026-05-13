@@ -59,7 +59,7 @@ export default function TaskCard({ task }: TaskCardProps) {
             gap: 1,
           }}
         >
-          <Typography variant="subtitle1" fontWeight={700}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             {task.title}
           </Typography>
 

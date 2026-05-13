@@ -61,7 +61,7 @@ export default function KanbanBoard() {
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={900}>
+        <Typography variant="h4" sx={{ fontWeight: 900 }}>
           Kanban ToDo Dashboard
         </Typography>
 
