@@ -76,7 +76,7 @@ Example:
 ## Project Structure
 
 ```txt
-todo-kanban-dashboard/
+ToDoList/
 ├── public/
 ├── src/
 │   ├── app/
