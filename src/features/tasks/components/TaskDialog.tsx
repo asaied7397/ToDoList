@@ -10,26 +10,13 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import type { RootState } from "../../../app/store";
 import { closeTaskDialog } from "../store/taskUISlice";
-import { createTask, updateTask } from "../api/tasksAPI";
 import type { Task, TaskColumn, TaskPriority } from "../types";
-
-const columnOptions: { label: string; value: TaskColumn }[] = [
-  { label: "To Do", value: "backlog" },
-  { label: "In Progress", value: "in_progress" },
-  { label: "In Review", value: "review" },
-  { label: "Done", value: "done" },
-];
-
-const priorityOptions: { label: string; value: TaskPriority }[] = [
-  { label: "Low", value: "low" },
-  { label: "Medium", value: "medium" },
-  { label: "High", value: "high" },
-];
+import { columnOptions, priorityOptions } from "../constants/tasksConstants";
+import { useTaskMutations } from "../hooks/useTaskMutations";
 
 interface TaskFormProps {
   selectedTask: Task | null;
@@ -38,7 +25,7 @@ interface TaskFormProps {
 }
 
 function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
-  const queryClient = useQueryClient();
+  const { createTaskMutation, updateTaskMutation } = useTaskMutations();
 
   const isEditMode = Boolean(selectedTask);
 
@@ -56,59 +43,45 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
     selectedTask?.priority ?? "medium",
   );
 
-  const createMutation = useMutation({
-    mutationFn: createTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["tasks"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["tasks-count"],
-      });
-      onClose();
-    },
-  });
+  // Determine if either mutation is currently pending to disable the submit button and show a loading state
+  const isSaving = createTaskMutation.isPending || updateTaskMutation.isPending;
 
-  const updateMutation = useMutation({
-    mutationFn: () => {
-      if (!selectedTask) {
-        throw new Error("No task selected for update");
-      }
-
-      return updateTask(selectedTask.id, {
-        title: title.trim(),
-        description: description.trim(),
-        column,
-        priority,
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["tasks"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["tasks-count"],
-      });
-      onClose();
-    },
-  });
-
-  const isSaving = createMutation.isPending || updateMutation.isPending;
-
+  // Handle form submission for both creating and updating tasks
   function handleSubmit() {
     if (!title.trim() || !description.trim()) return;
 
     if (isEditMode) {
-      updateMutation.mutate();
+      if (!selectedTask) return;
+
+      updateTaskMutation.mutate(
+        {
+          id: selectedTask.id,
+          payload: {
+            title: title.trim(),
+            description: description.trim(),
+            column,
+            priority,
+          },
+        },
+        {
+          onSuccess: onClose,
+        },
+      );
+
       return;
     }
 
-    createMutation.mutate({
-      title: title.trim(),
-      description: description.trim(),
-      column,
-      priority,
-    });
+    createTaskMutation.mutate(
+      {
+        title: title.trim(),
+        description: description.trim(),
+        column,
+        priority,
+      },
+      {
+        onSuccess: onClose,
+      },
+    );
   }
 
   return (
@@ -190,12 +163,15 @@ function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
 export default function TaskDialog() {
   const dispatch = useDispatch();
 
+  // Get dialog state from Redux store
   const { isDialogOpen, selectedTask, selectedColumn } = useSelector(
     (state: RootState) => state.taskUi,
   );
 
+  // Determine if we're in edit mode based on whether a task is selected
   const isEditMode = Boolean(selectedTask);
 
+  // Handle dialog close
   function handleClose() {
     dispatch(closeTaskDialog());
   }

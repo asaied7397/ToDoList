@@ -1,39 +1,19 @@
 import { Box, Typography } from "@mui/material";
 import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
-import {
-  DndContext,
-  type DragEndEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
-import { useMutation, useQueries, useQueryClient } from "@tanstack/react-query";
-import type { ColumnConfig, Task, TaskColumn } from "../types";
-import { updateTask, getTasksByColumn } from "../api/tasksAPI";
+import { DndContext } from "@dnd-kit/core";
+import { useQueries } from "@tanstack/react-query";
+import { getTasksByColumn } from "../api/tasksAPI";
+import { columns } from "../constants/tasksConstants";
+import { useKanbanDrag } from "../hooks/useKanbanDrag";
 import KanbanColumn from "./KanbanColumn";
 import SearchBar from "./SearchBar";
 import TaskDialog from "./TaskDialog";
 
-const columns: ColumnConfig[] = [
-  { id: "backlog", title: "To Do" },
-  { id: "in_progress", title: "In Progress" },
-  { id: "review", title: "In Review" },
-  { id: "done", title: "Done" },
-];
-
 export default function KanbanBoard() {
-  const queryClient = useQueryClient();
+  // Custom hook to manage drag-and-drop logic for the Kanban board
+  const { sensors, handleDragEnd } = useKanbanDrag();
 
-  // Setup drag-and-drop sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-  );
-
-  // Fetch task counts for all columns to display total count in header
+  // Fetch the count of tasks for each column using React Query's useQueries
   const taskCountQueries = useQueries({
     queries: columns.map((column) => ({
       queryKey: ["tasks-count", column.id],
@@ -45,53 +25,18 @@ export default function KanbanBoard() {
         }),
     })),
   });
-
+  // Calculate the total number of tasks across all columns by summing the counts from each query
   const totalTasksCount = taskCountQueries.reduce((total, query) => {
     return total + (query.data?.totalCount ?? 0);
   }, 0);
-
-  // Mutation to move task between columns
-  const moveTaskMutation = useMutation({
-    mutationFn: ({ taskId, column }: { taskId: string; column: TaskColumn }) =>
-      updateTask(taskId, { column }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["tasks"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["tasks-count"],
-      });
-    },
-  });
-
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (!over) return;
-
-    const targetColumn = over.id as TaskColumn;
-    const draggedTask = active.data.current?.task as Task | undefined;
-
-    if (!draggedTask) return;
-    if (draggedTask.column === targetColumn) return;
-
-    moveTaskMutation.mutate({
-      taskId: draggedTask.id,
-      column: targetColumn,
-    });
-  }
 
   return (
     <Box>
       <div
         style={{
           display: "flex",
-          alignItems: "center",
           justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: 2,
-          marginBottom: 3,
+          alignItems: "center",
         }}
       >
         <Box

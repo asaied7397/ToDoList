@@ -9,49 +9,21 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { useDraggable } from "@dnd-kit/core";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CSS } from "@dnd-kit/utilities";
 import { useDispatch } from "react-redux";
-import type { Task, TaskPriority } from "../types";
-import { deleteTask } from "../api/tasksAPI";
+import type { Task } from "../types";
 import { openEditTaskDialog } from "../store/taskUISlice";
+import { getPriorityStyle } from "../utils/tasksUtils";
+import { useTaskMutations } from "../hooks/useTaskMutations";
 
 interface TaskCardProps {
   task: Task;
 }
 
-function getPriorityColor(priority: TaskPriority) {
-  if (priority === "high") {
-    return {
-      label: "High",
-      backgroundColor: "#ffebee",
-      color: "#c62828",
-      borderColor: "#ef9a9a",
-    };
-  }
-
-  if (priority === "medium") {
-    return {
-      label: "Medium",
-      backgroundColor: "#fff8e1",
-      color: "#ef6c00",
-      borderColor: "#ffcc80",
-    };
-  }
-
-  return {
-    label: "Low",
-    backgroundColor: "#e8f5e9",
-    color: "#2e7d32",
-    borderColor: "#a5d6a7",
-  };
-}
-
 export default function TaskCard({ task }: TaskCardProps) {
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
+  const { deleteTaskMutation } = useTaskMutations();
 
-  // Setup draggable behavior for the task card
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: String(task.id),
@@ -60,19 +32,7 @@ export default function TaskCard({ task }: TaskCardProps) {
       },
     });
 
-  const deleteMutation = useMutation({
-    mutationFn: deleteTask,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["tasks"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ["tasks-count"],
-      });
-    },
-  });
-
-  const priorityStyle = getPriorityColor(task.priority ?? "medium");
+  const priorityStyle = getPriorityStyle(task.priority ?? "medium");
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -85,15 +45,9 @@ export default function TaskCard({ task }: TaskCardProps) {
       style={style}
       sx={{
         mb: 1.5,
-
-        cursor: isDragging ? "grabbing" : "grab",
-
         boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-
         borderRadius: 2,
       }}
-      {...listeners}
-      {...attributes}
     >
       <CardContent sx={{ p: 2, "&:last-child": { pb: 2 } }}>
         <Box
@@ -102,7 +56,11 @@ export default function TaskCard({ task }: TaskCardProps) {
             justifyContent: "space-between",
             gap: 1,
             alignItems: "flex-start",
+            cursor: isDragging ? "grabbing" : "grab",
+            mt: -0.5,
           }}
+          {...listeners}
+          {...attributes}
         >
           <Box sx={{ display: "flex", gap: 1, alignItems: "flex-start" }}>
             <Box>
@@ -144,8 +102,8 @@ export default function TaskCard({ task }: TaskCardProps) {
             <IconButton
               size="small"
               color="error"
-              onClick={() => deleteMutation.mutate(String(task.id))}
-              disabled={deleteMutation.isPending}
+              onClick={() => deleteTaskMutation.mutate(String(task.id))}
+              disabled={deleteTaskMutation.isPending}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>

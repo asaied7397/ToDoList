@@ -7,54 +7,37 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { useDroppable } from "@dnd-kit/core";
-import { useQuery } from "@tanstack/react-query";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useMemo } from "react";
-import type { RootState } from "../../../app/store";
-import { getTasksByColumn } from "../api/tasksAPI";
 import type { TaskColumn } from "../types";
 import TaskCard from "./TaskCard";
 import { openCreateTaskDialog, setColumnPage } from "../store/taskUISlice";
+import { columnColors } from "../constants/tasksConstants";
+import { useColumnTasks } from "../hooks/useColumnTasks";
 
 interface KanbanColumnProps {
   id: TaskColumn;
   title: string;
 }
 
-const PAGE_LIMIT = 5;
-
 export default function KanbanColumn({ id, title }: KanbanColumnProps) {
   const dispatch = useDispatch();
 
-  // Get search and page state from Redux
-  const search = useSelector((state: RootState) => state.taskUi.search);
-  const page = useSelector((state: RootState) => state.taskUi.pages[id]);
-
-  // Setup droppable area for drag-and-drop
+  // Set up the droppable area for the Kanban column using the useDroppable hook from dnd-kit
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
 
-  // Fetch tasks for this column using React Query
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["tasks", id, search, page],
-    queryFn: () =>
-      getTasksByColumn({
-        column: id,
-        search,
-        page,
-        limit: PAGE_LIMIT,
-      }),
-  });
+  // Custom hook to fetch tasks for the column and manage pagination state
+  const { tasks, totalCount, totalPages, page, isLoading, isError } =
+    useColumnTasks(id);
 
-  const tasks = data?.tasks ?? [];
-  const totalCount = data?.totalCount ?? 0;
-  const totalPages = Math.ceil(totalCount / PAGE_LIMIT);
-
+  // Memoize the array of page numbers to avoid unnecessary recalculations on re-renders
   const pageNumbers = useMemo(() => {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }, [totalPages]);
 
+  // Function to handle page changes when the user clicks on pagination buttons
   function changePage(newPage: number) {
     dispatch(
       setColumnPage({
@@ -62,14 +45,6 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
         page: newPage,
       }),
     );
-  }
-
-  function goToPreviousPage() {
-    changePage(Math.max(page - 1, 1));
-  }
-
-  function goToNextPage() {
-    changePage(Math.min(page + 1, totalPages));
   }
 
   return (
@@ -103,14 +78,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              backgroundColor:
-                id === "backlog"
-                  ? " #1976d2"
-                  : id === "in_progress"
-                    ? "#f59e0b"
-                    : id === "review"
-                      ? "#e20bf5"
-                      : "#2e7d32",
+              backgroundColor: columnColors[id],
               flexShrink: 0,
             }}
           />
@@ -134,12 +102,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
         </Typography>
       </Box>
 
-      <Box
-        sx={{
-          flex: 1,
-          minHeight: 390,
-        }}
-      >
+      <Box sx={{ flex: 1, minHeight: 390 }}>
         {isLoading && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <CircularProgress size={28} />
@@ -173,14 +136,13 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
             mt: 2,
             flexWrap: "wrap",
             flexShrink: 0,
-            marginBottom: 2,
           }}
         >
           <Button
             size="small"
             variant="outlined"
             disabled={page === 1}
-            onClick={goToPreviousPage}
+            onClick={() => changePage(Math.max(page - 1, 1))}
           >
             Prev
           </Button>
@@ -191,9 +153,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
               size="small"
               variant={pageNumber === page ? "contained" : "outlined"}
               onClick={() => changePage(pageNumber)}
-              sx={{
-                minWidth: 36,
-              }}
+              sx={{ minWidth: 36 }}
             >
               {pageNumber}
             </Button>
@@ -203,7 +163,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
             size="small"
             variant="outlined"
             disabled={page === totalPages}
-            onClick={goToNextPage}
+            onClick={() => changePage(Math.min(page + 1, totalPages))}
           >
             Next
           </Button>
@@ -214,6 +174,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
         variant="contained"
         startIcon={<AddIcon />}
         onClick={() => dispatch(openCreateTaskDialog(id))}
+        sx={{ mt: 2 }}
       >
         Add Task
       </Button>

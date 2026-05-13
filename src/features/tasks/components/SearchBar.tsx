@@ -5,6 +5,8 @@ import { setSearch } from "../store/taskUISlice";
 
 export default function SearchBar() {
   const dispatch = useDispatch();
+
+  // Get the current search query from the Redux store to keep the input controlled and in sync with the global state
   const search = useSelector((state: RootState) => state.taskUi.search);
 
   return (
@@ -31,14 +33,6 @@ export default function SearchBar() {
           backgroundColor: "white",
         }}
       />
-
-      {/* <Button
-        variant="contained"
-        startIcon={<AddIcon />}
-        onClick={() => dispatch(openCreateTaskDialog())}
-      >
-        Add Task
-      </Button> */}
     </Box>
   );
 }
