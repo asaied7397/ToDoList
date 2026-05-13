@@ -1,8 +1,7 @@
-import { Box, Button, TextField } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Box, TextField } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
-import { openCreateTaskDialog, setSearch } from "../store/taskUISlice";
+import { setSearch } from "../store/taskUISlice";
 
 export default function SearchBar() {
   const dispatch = useDispatch();
@@ -21,7 +20,7 @@ export default function SearchBar() {
     >
       <TextField
         size="small"
-        placeholder="Search by title or description..."
+        placeholder="Search tasks..."
         value={search}
         onChange={(e) => dispatch(setSearch(e.target.value))}
         sx={{
@@ -33,13 +32,13 @@ export default function SearchBar() {
         }}
       />
 
-      <Button
+      {/* <Button
         variant="contained"
         startIcon={<AddIcon />}
         onClick={() => dispatch(openCreateTaskDialog())}
       >
         Add Task
-      </Button>
+      </Button> */}
     </Box>
   );
 }

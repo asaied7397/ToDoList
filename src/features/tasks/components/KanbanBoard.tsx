@@ -63,17 +63,31 @@ export default function KanbanBoard() {
 
   return (
     <Box>
-      <Box sx={{ mb: 3 }}>
-        <Typography variant="h4" sx={{ fontWeight: 900 }}>
-          Kanban ToDo Dashboard
-        </Typography>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 2,
+          borderBottom: "1px solid",
+          borderColor: "#e0e0e0",
+          paddingBottom: 1,
+          marginBottom: 50,
+        }}
+      >
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="h4" sx={{ fontWeight: 900 }}>
+            Kanban ToDo Dashboard
+          </Typography>
 
-        <Typography color="text.secondary" sx={{ mt: 0.5 }}>
-          Manage tasks across Backlog, In Progress, Review, and Done.
-        </Typography>
-      </Box>
+          <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+            Manage tasks across Backlog, In Progress, Review, and Done.
+          </Typography>
+        </Box>
 
-      <SearchBar />
+        <SearchBar />
+      </div>
 
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <Box

@@ -27,10 +27,11 @@ const columnOptions: { label: string; value: TaskColumn }[] = [
 
 interface TaskFormProps {
   selectedTask: Task | null;
+  selectedColumn: TaskColumn;
   onClose: () => void;
 }
 
-function TaskForm({ selectedTask, onClose }: TaskFormProps) {
+function TaskForm({ selectedTask, selectedColumn, onClose }: TaskFormProps) {
   const queryClient = useQueryClient();
 
   const isEditMode = Boolean(selectedTask);
@@ -40,7 +41,7 @@ function TaskForm({ selectedTask, onClose }: TaskFormProps) {
     selectedTask?.description ?? "",
   );
   const [column, setColumn] = useState<TaskColumn>(
-    selectedTask?.column ?? "backlog",
+    selectedTask?.column ?? selectedColumn ?? "backlog",
   );
 
   const createMutation = useMutation({
@@ -152,7 +153,7 @@ function TaskForm({ selectedTask, onClose }: TaskFormProps) {
 export default function TaskDialog() {
   const dispatch = useDispatch();
 
-  const { isDialogOpen, selectedTask } = useSelector(
+  const { isDialogOpen, selectedTask, selectedColumn } = useSelector(
     (state: RootState) => state.taskUi,
   );
 
@@ -170,6 +171,7 @@ export default function TaskDialog() {
         <TaskForm
           key={selectedTask?.id ?? "create-task"}
           selectedTask={selectedTask}
+          selectedColumn={selectedColumn}
           onClose={handleClose}
         />
       )}

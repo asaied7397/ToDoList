@@ -5,6 +5,7 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { useDroppable } from "@dnd-kit/core";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,7 +14,7 @@ import type { RootState } from "../../../app/store";
 import { getTasksByColumn } from "../api/tasksAPI";
 import type { TaskColumn } from "../types";
 import TaskCard from "./TaskCard";
-import { setColumnPage } from "../store/taskUISlice";
+import { openCreateTaskDialog, setColumnPage } from "../store/taskUISlice";
 
 interface KanbanColumnProps {
   id: TaskColumn;
@@ -188,6 +189,14 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
           </Button>
         </Box>
       )}
+
+      <Button
+        variant="contained"
+        startIcon={<AddIcon />}
+        onClick={() => dispatch(openCreateTaskDialog(id))}
+      >
+        Add Task
+      </Button>
     </Paper>
   );
 }

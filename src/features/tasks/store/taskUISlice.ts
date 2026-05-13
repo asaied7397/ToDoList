@@ -5,6 +5,7 @@ interface TaskUiState {
   search: string;
   isDialogOpen: boolean;
   selectedTask: Task | null;
+  selectedColumn: TaskColumn;
   pages: Record<TaskColumn, number>;
 }
 
@@ -12,6 +13,7 @@ const initialState: TaskUiState = {
   search: "",
   isDialogOpen: false,
   selectedTask: null,
+  selectedColumn: "backlog",
   pages: {
     backlog: 1,
     in_progress: 1,
@@ -42,14 +44,16 @@ const taskUiSlice = createSlice({
       state.pages[action.payload.column] = action.payload.page;
     },
 
-    openCreateTaskDialog(state) {
+    openCreateTaskDialog(state, action: PayloadAction<TaskColumn>) {
       state.isDialogOpen = true;
       state.selectedTask = null;
+      state.selectedColumn = action.payload;
     },
 
     openEditTaskDialog(state, action: PayloadAction<Task>) {
       state.isDialogOpen = true;
       state.selectedTask = action.payload;
+      state.selectedColumn = action.payload.column;
     },
 
     closeTaskDialog(state) {
