@@ -128,7 +128,7 @@ git clone https://github.com/asaied7397/ToDoList
 Then move into the project folder:
 
 ```bash
-cd todo-kanban-dashboard
+cd ToDoList
 ```
 
 ---
@@ -464,6 +464,6 @@ Supported operations:
 
 - The app uses React Query for API data caching.
 - Redux is used only for UI state, not API data.
-- Dragging is started from the card body with prevent accidental dragging by accedental constraints.
+- Dragging starts from the card body with an activation constraint to reduce accidental dragging.
 - The mock API must be running for the app to work correctly.
 - A live deployment may require replacing json-server with a hosted API or another mock backend.
