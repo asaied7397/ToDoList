@@ -12,11 +12,11 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { RootState } from "../../../app/store";
 import { closeTaskDialog } from "../store/taskUISlice";
 import { createTask, updateTask } from "../api/tasksAPI";
-import type { TaskColumn } from "../types";
+import type { Task, TaskColumn } from "../types";
 
 const columnOptions: { label: string; value: TaskColumn }[] = [
   { label: "Backlog", value: "backlog" },
@@ -25,31 +25,23 @@ const columnOptions: { label: string; value: TaskColumn }[] = [
   { label: "Done", value: "done" },
 ];
 
-export default function TaskDialog() {
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
+interface TaskFormProps {
+  selectedTask: Task | null;
+  onClose: () => void;
+}
 
-  const { isDialogOpen, selectedTask } = useSelector(
-    (state: RootState) => state.taskUi,
-  );
+function TaskForm({ selectedTask, onClose }: TaskFormProps) {
+  const queryClient = useQueryClient();
 
   const isEditMode = Boolean(selectedTask);
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [column, setColumn] = useState<TaskColumn>("backlog");
-
-  useEffect(() => {
-    if (selectedTask) {
-      setTitle(selectedTask.title);
-      setDescription(selectedTask.description);
-      setColumn(selectedTask.column);
-    } else {
-      setTitle("");
-      setDescription("");
-      setColumn("backlog");
-    }
-  }, [selectedTask, isDialogOpen]);
+  const [title, setTitle] = useState(selectedTask?.title ?? "");
+  const [description, setDescription] = useState(
+    selectedTask?.description ?? "",
+  );
+  const [column, setColumn] = useState<TaskColumn>(
+    selectedTask?.column ?? "backlog",
+  );
 
   const createMutation = useMutation({
     mutationFn: createTask,
@@ -57,22 +49,27 @@ export default function TaskDialog() {
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
       });
-      dispatch(closeTaskDialog());
+      onClose();
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: () =>
-      updateTask(selectedTask!.id, {
-        title,
-        description,
+    mutationFn: () => {
+      if (!selectedTask) {
+        throw new Error("No task selected for update");
+      }
+
+      return updateTask(selectedTask.id, {
+        title: title.trim(),
+        description: description.trim(),
         column,
-      }),
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["tasks"],
       });
-      dispatch(closeTaskDialog());
+      onClose();
     },
   });
 
@@ -94,14 +91,7 @@ export default function TaskDialog() {
   }
 
   return (
-    <Dialog
-      open={isDialogOpen}
-      onClose={() => dispatch(closeTaskDialog())}
-      fullWidth
-      maxWidth="sm"
-    >
-      <DialogTitle>{isEditMode ? "Edit Task" : "Create Task"}</DialogTitle>
-
+    <>
       <DialogContent
         sx={{
           display: "flex",
@@ -145,7 +135,8 @@ export default function TaskDialog() {
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={() => dispatch(closeTaskDialog())}>Cancel</Button>
+        <Button onClick={onClose}>Cancel</Button>
+
         <Button
           variant="contained"
           onClick={handleSubmit}
@@ -154,6 +145,34 @@ export default function TaskDialog() {
           {isSaving ? "Saving..." : isEditMode ? "Save Changes" : "Create"}
         </Button>
       </DialogActions>
+    </>
+  );
+}
+
+export default function TaskDialog() {
+  const dispatch = useDispatch();
+
+  const { isDialogOpen, selectedTask } = useSelector(
+    (state: RootState) => state.taskUi,
+  );
+
+  const isEditMode = Boolean(selectedTask);
+
+  function handleClose() {
+    dispatch(closeTaskDialog());
+  }
+
+  return (
+    <Dialog open={isDialogOpen} onClose={handleClose} fullWidth maxWidth="sm">
+      <DialogTitle>{isEditMode ? "Edit Task" : "Create Task"}</DialogTitle>
+
+      {isDialogOpen && (
+        <TaskForm
+          key={selectedTask?.id ?? "create-task"}
+          selectedTask={selectedTask}
+          onClose={handleClose}
+        />
+      )}
     </Dialog>
   );
 }

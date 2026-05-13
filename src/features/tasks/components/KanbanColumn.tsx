@@ -7,12 +7,13 @@ import {
 } from "@mui/material";
 import { useDroppable } from "@dnd-kit/core";
 import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
-import { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useMemo } from "react";
 import type { RootState } from "../../../app/store";
 import { getTasksByColumn } from "../api/tasksAPI";
 import type { TaskColumn } from "../types";
 import TaskCard from "./TaskCard";
+import { setColumnPage } from "../store/taskUISlice";
 
 interface KanbanColumnProps {
   id: TaskColumn;
@@ -22,16 +23,14 @@ interface KanbanColumnProps {
 const PAGE_LIMIT = 5;
 
 export default function KanbanColumn({ id, title }: KanbanColumnProps) {
+  const dispatch = useDispatch();
+
   const search = useSelector((state: RootState) => state.taskUi.search);
-  const [page, setPage] = useState(1);
+  const page = useSelector((state: RootState) => state.taskUi.pages[id]);
 
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
-
-  useEffect(() => {
-    setPage(1);
-  }, [search]);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["tasks", id, search, page],
@@ -52,12 +51,21 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }, [totalPages]);
 
+  function changePage(newPage: number) {
+    dispatch(
+      setColumnPage({
+        column: id,
+        page: newPage,
+      }),
+    );
+  }
+
   function goToPreviousPage() {
-    setPage((currentPage) => Math.max(currentPage - 1, 1));
+    changePage(Math.max(page - 1, 1));
   }
 
   function goToNextPage() {
-    setPage((currentPage) => Math.min(currentPage + 1, totalPages));
+    changePage(Math.min(page + 1, totalPages));
   }
 
   return (
@@ -158,7 +166,7 @@ export default function KanbanColumn({ id, title }: KanbanColumnProps) {
               key={pageNumber}
               size="small"
               variant={pageNumber === page ? "contained" : "outlined"}
-              onClick={() => setPage(pageNumber)}
+              onClick={() => changePage(pageNumber)}
               sx={{
                 minWidth: 36,
               }}

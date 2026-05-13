@@ -47,30 +47,6 @@
       "title": "Write README file",
       "description": "Add setup instructions, features, and tech stack",
       "column": "done"
-    },
-    {
-      "title": "ahmed",
-      "description": "hbbhd",
-      "column": "backlog",
-      "id": "NwL8M1RlmD8"
-    },
-    {
-      "title": "ahmed2",
-      "description": "gabhvdx",
-      "column": "backlog",
-      "id": "yU7Clv4qc_Y"
-    },
-    {
-      "title": "ahmed3",
-      "description": "bhdnm",
-      "column": "backlog",
-      "id": "1TsGpqENJ0U"
-    },
-    {
-      "title": "ahmed4",
-      "description": "fcvgbhnj",
-      "column": "backlog",
-      "id": "ICh36yTgYQ8"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
