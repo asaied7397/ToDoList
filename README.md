@@ -416,7 +416,7 @@ Contains helper functions.
 
 ```txt
 utils/
-└── taskUtils.ts
+└── tasksUtils.ts
 ```
 
 ### API
@@ -425,7 +425,7 @@ Contains API requests.
 
 ```txt
 api/
-└── tasksApi.ts
+└── tasksAPI.ts
 ```
 
 ### Store
@@ -434,7 +434,7 @@ Contains Redux Toolkit slice.
 
 ```txt
 store/
-└── taskUiSlice.ts
+└── taskUISlice.ts
 ```
 
 ---
